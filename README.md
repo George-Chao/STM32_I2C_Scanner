@@ -6,9 +6,7 @@ Simple I2C scanner with USB CDC output interface.
 
 Based on stm32f103c8t6 'BluePill' board.
 
-USB VCP testing output:
-
-<code>
+## USB VCP testing output:
 
 STM32 I2C Scanner    V0.01 :
 
@@ -55,12 +53,3 @@ SCAN...
 0x7E   ---    ---    ---    ---  
 0x7F   ---    ---    ---    ---  
 
-STM32 I2C Scanner    V0.01 :
-
-PB6 -> I2C1_SCL
-PB7 -> I2C1_SDA
-
-type 's' to scan
-
-
-</code>
