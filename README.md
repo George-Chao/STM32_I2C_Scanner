@@ -16,7 +16,7 @@ PB7 -> I2C1_SDA
 type 's' to scan
 
 SCAN...
-       100KHz 200KHz 300KHz 400KHz
+       100KHz 200KHz 300KHz 400KHz  
 0x01   ---    ---    ---    ---  
 0x02   ---    ---    ---    ---  
 0x03   ---    ---    ---    ---  
