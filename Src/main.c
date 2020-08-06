@@ -22,8 +22,8 @@
 
 #define I2C_REQUEST_WRITE 0x00
 
-char CDC_tx_buff[64];
-char CDC_rx_buff[8];
+uint8_t CDC_tx_buff[64];
+uint8_t CDC_rx_buff[8];
 uint8_t CDC_rx_flag = 0;
 uint32_t I2C_speed[4] = { 100000, 200000, 300000, 400000 };
 
@@ -68,10 +68,9 @@ uint8_t I2C_Roll_Speed(uint16_t addr)
 {
     LL_RCC_ClocksTypeDef rcc_clocks;
     uint8_t idx;
-    uint32_t freq;
 
     LL_RCC_GetSystemClocksFreq(&rcc_clocks);
-    sprintf(CDC_tx_buff, "\r\n0X%x", addr);
+    sprintf((char*)CDC_tx_buff, "\r\n0x%02X ", addr);
     CDC_Transmit_FS(CDC_tx_buff, 7);
     for (idx = 0; idx < 4; idx++) {
         LL_mDelay(3);
@@ -79,12 +78,13 @@ uint8_t I2C_Roll_Speed(uint16_t addr)
         LL_I2C_ConfigSpeed(I2C1, rcc_clocks.PCLK1_Frequency, I2C_speed[idx], LL_I2C_DUTYCYCLE_2);
         LL_I2C_Enable(I2C1);
         if (I2C_Check(addr)) {
-            sprintf(CDC_tx_buff, "   V   ");
+            sprintf((char*)CDC_tx_buff, "   V   ");
             CDC_Transmit_FS(CDC_tx_buff, 7);
-            LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_12); // LED on : I2C slave found
+          
+            LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_13); // LED on : I2C slave found
         }
         else {
-            sprintf(CDC_tx_buff, "  ---  ");
+            sprintf((char*)CDC_tx_buff, "  ---  ");
             CDC_Transmit_FS(CDC_tx_buff, 7);
         }
     }
@@ -93,32 +93,35 @@ uint8_t I2C_Roll_Speed(uint16_t addr)
 
 int main(void)
 {
-    HAL_Init();
-    SystemClock_Config();
+  HAL_Init();
+  SystemClock_Config();
 
-    MX_GPIO_Init();
-    MX_I2C1_Init();
-    MX_USB_DEVICE_Init();
+  MX_GPIO_Init();
+  MX_I2C1_Init();
+  MX_USB_DEVICE_Init();
 
-    LL_mDelay(5000);
-    while (1) {
+  LL_mDelay(2000);
+  
+  while (1) {
+    LL_mDelay(1000);
+
+    CDC_Transmit_FS((uint8_t*)"\r\n\r\nSTM32 I2C Scanner    V0.01 :\r\n\r\nPB6 -> I2C1_SCL\r\nPB7 -> I2C1_SDA\r\n\r\ntype 's' to scan\r\n\r\n", 92);
+
+    while (!CDC_rx_flag) {
         LL_mDelay(1000);
-        CDC_Transmit_FS("\n\rDirty STM32 I2C Scanner V0.01\r\ntype 's' to scan\n\r", 51);
-        while (!CDC_rx_flag) {
-            LL_mDelay(1000);
-        }
-        if (CDC_rx_flag == 1) {
-						LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_12); 
-            CDC_Transmit_FS("SCAN...\n\r", 9);
-            LL_mDelay(5);
-            CDC_Transmit_FS("     100Khz 200Khz 300Khz 400Khz", 35);
-            for (int i = 1; i < 128; i++) {
-                LL_mDelay(100);
-                I2C_Roll_Speed(i);
-            }
-        }
-        CDC_rx_flag = 0;
     }
+    if (CDC_rx_flag == 1) {
+        LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13); 
+        CDC_Transmit_FS((uint8_t*)"SCAN...\r\n", 9);
+        LL_mDelay(5);
+        CDC_Transmit_FS((uint8_t*)"       100KHz 200KHz 300KHz 400KHz", 34);
+        for (int i = 1; i < 128; i++) {
+            LL_mDelay(100);
+            I2C_Roll_Speed(i);
+        }
+    }
+    CDC_rx_flag = 0;
+  }
 }
 
 /**
@@ -211,20 +214,17 @@ static void MX_GPIO_Init(void)
 {
     LL_GPIO_InitTypeDef GPIO_InitStruct = { 0 };
     /* GPIO Ports Clock Enable */
-    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOD);
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
+    LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOC);
 	  
-	// STM32 'black pill' onboard LED
-  
-
-  /**/
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_12;
+	// STM32 'Bluepill' onboard LED, PC13
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_13;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-  LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_12);
+  LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
 	
 }
 

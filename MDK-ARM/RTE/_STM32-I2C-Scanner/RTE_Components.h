@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'scanner' 
- * Target:  'scanner' 
+ * Project: 'STM32-I2C-Scanner' 
+ * Target:  'STM32-I2C-Scanner' 
  */
 
 #ifndef RTE_COMPONENTS_H
