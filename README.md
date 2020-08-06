@@ -1,14 +1,12 @@
- # STM32 I2C Scanner
+## STM32 I2C Scanner, RadioOperator modified version !!!  
 
-RadioOperator modified version!!!!
+Simple I2C scanner with USB CDC output interface.  
 
-Simple I2C scanner with USB CDC output interface.
+Based on stm32f103c8t6 'BluePill' board.  
 
-Based on stm32f103c8t6 'BluePill' board.
+### USB VCP testing output:  
 
-## USB VCP testing output:
-
-STM32 I2C Scanner    V0.01 :
+STM32 I2C Scanner    V0.01 :  
 
 PB6 -> I2C1_SCL
 PB7 -> I2C1_SDA
